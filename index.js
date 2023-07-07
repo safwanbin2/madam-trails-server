@@ -369,6 +369,14 @@ function run() {
             const filter = { _id: new ObjectId(id) };
             const result = await BlogsCollection.deleteOne(filter);
             res.send(result)
+        });
+
+
+
+
+        // !importtant orders
+        app.get("/orders/neworder", async(req, res) => {
+            
         })
 
 
