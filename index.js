@@ -405,7 +405,30 @@ function run() {
             res.send(result);
         })
 
+        // !getting orders as their status from admin panel
+        app.get("/orders/all", async (req, res) => {
+            const orderStatus = req.query.orderstatus;
+            const filter = { status: orderStatus };
+            const cursor = OrdersCollection.find(filter);
+            const result = (await cursor.toArray()).reverse();
+            res.send(result);
+        })
 
+        // !updating order status by admin from admin panel
+        app.put("/orders/updatestatus", async (req, res) => {
+            const id = req.query.id;
+            const status = req.query.status;
+            const filter = { _id: new ObjectId(id) };
+            const updatedDocuments = {
+                $set: {
+                    status: status
+                }
+            }
+            const options = { upsert: true }
+
+            const result = await OrdersCollection.updateOne(filter, updatedDocuments, options);
+            res.send(result);
+        })
 
 
 
