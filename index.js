@@ -40,6 +40,7 @@ function run() {
         const CartsCollection = client.db("WorkingTitle").collection("cart");
         const MessagesCollection = client.db("WorkingTitle").collection("messages");
         const BlogsCollection = client.db("WorkingTitle").collection("blogs");
+        const OrdersCollection = client.db("WorkingTitle").collection("orders");
 
         // posting users
         app.post('/users', async (req, res) => {
@@ -375,9 +376,40 @@ function run() {
 
 
         // !importtant orders
-        app.get("/orders/neworder", async(req, res) => {
-            
+        app.post("/orders/placeorder", async (req, res) => {
+            const order = req.body;
+            const cartItems = await CartsCollection.find({ buyerEmail: req.query.email }).toArray();
+            order.products = cartItems;
+
+            const result = await OrdersCollection.insertOne(order);
+            if (result.insertedId || result.acknowledged) {
+                await CartsCollection.deleteMany({ buyerEmail: req.query.email });
+            }
+            res.send(result);
+        });
+
+        // !getting user specific order by querying with email
+        app.get("/orders/myorders", async (req, res) => {
+            const email = req.query.email;
+            const filter = { buyerEmail: email };
+            const cursor = OrdersCollection.find(filter);
+            const result = (await cursor.toArray()).reverse();
+            res.send(result);
+        });
+
+        // !getting specific id order with id query
+        app.get("/orders/myorders/:id", async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: new ObjectId(id) };
+            const result = await OrdersCollection.findOne(filter);
+            res.send(result);
         })
+
+
+
+
+
+
 
 
     }
