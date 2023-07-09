@@ -388,14 +388,39 @@ function run() {
             res.send(result);
         });
 
-        // !getting user specific order by querying with email
+        // !deleting orders that are delivered
+        app.delete("/orders/delete", async (req, res) => {
+            const id = req.query.id;
+            const filter = { _id: new ObjectId(id) };
+            const result = await OrdersCollection.deleteOne(filter);
+            res.send(result);
+        })
+
+        // !getting user specific order by querying with email without delivered items
         app.get("/orders/myorders", async (req, res) => {
             const email = req.query.email;
-            const filter = { buyerEmail: email };
+            const filter = {
+                buyerEmail: email,
+                status: {
+                    $ne: "delivered"
+                }
+            };
             const cursor = OrdersCollection.find(filter);
             const result = (await cursor.toArray()).reverse();
             res.send(result);
         });
+
+        //! getting user specific orders by querying with email, only delivered items,called from profle-recieved section
+        app.get("/orders/myorders/delivered", async (req, res) => {
+            const email = req.query.email;
+            const filter = {
+                buyerEmail: email,
+                status: "delivered"
+            };
+            const cursor = OrdersCollection.find(filter);
+            const result = (await cursor.toArray()).reverse();
+            res.send(result);
+        })
 
         // !getting specific id order with id query
         app.get("/orders/myorders/:id", async (req, res) => {
