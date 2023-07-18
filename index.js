@@ -1,7 +1,6 @@
 require("dotenv").config();
 const express = require('express');
 const cors = require('cors');
-const PaytmChecksum = require('./PaytmChecksum');
 
 
 const port = process.env.PORT || 5000;
@@ -126,10 +125,6 @@ function run() {
                     $regex: searchText,
                     $options: "i"
                 },
-                // category: {
-                //     $regex: categoryText,
-                //     $options: "i"
-                // }
             };
             if (categoryText) {
                 filter.category = categoryText
@@ -454,67 +449,7 @@ function run() {
 
             const result = await OrdersCollection.updateOne(filter, updatedDocuments, options);
             res.send(result);
-        })
-
-        
-
-
-
-
-
-        // // !payment start paytm
-
-        // app.post("/payment", async (req, res) => {
-
-        //     const newOrder = req.body;
-        //     const totalAmount = JSON.stringify(newOrder.summay?.totalPrice)
-
-        //     var paytmParams = {};
-
-        //     /* initialize an array */
-        //     paytmParams["MID"] = process.env.MID;
-        //     paytmParams["CUST_ID"] = newOrder.buyerId;
-        //     paytmParams["WEBSITE"] = process.env.WEBSITE;
-        //     paytmParams["CHANNEL_ID"] = process.env.CHANNEL_ID;
-        //     paytmParams["INDUSTRY_TYPE_ID"] = process.env.INDUSTRY_TYPE_ID;
-        //     paytmParams["TXN_AMOUNT"] = totalAmount;
-        //     paytmParams["CALLBACK_URL"] = "http://localhost:5000/callback";
-        //     paytmParams["EMAIL"] = newOrder.buyerEmail;
-        //     paytmParams["MOBILE_NO"] = newOrder.buyerPhone;
-
-
-        //     /**
-        //     * Generate checksum by parameters we have
-        //     * Find your Merchant Key in your Paytm Dashboard at https://dashboard.paytm.com/next/apikeys 
-        //     */
-        //     var paytmChecksum = await PaytmChecksum.generateSignature(paytmParams, process.env.MERCENT_KEY);
-        //     paytmChecksum.then(function (checksum) {
-        //         let params = {
-        //             ...paytmParams,
-        //             "CHECKSUMHASH": checksum
-        //         }
-        //         res.send(params)
-        //     }).catch(function (error) {
-        //         console.log(error);
-        //     });
-
-        // })
-
-
-
-
-
-        // // !payment end
-
-
-
-
-
-
-
-
-
-
+        });
 
 
     }
