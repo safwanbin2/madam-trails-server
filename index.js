@@ -6,6 +6,7 @@ const cors = require('cors');
 const port = process.env.PORT || 5000;
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.mogpxeu.mongodb.net/?retryWrites=true&w=majority`;
+// const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@madamtrails.6ckcarh.mongodb.net/?retryWrites=true&w=majority`;
 
 const app = express();
 
@@ -105,21 +106,23 @@ function run() {
         app.get("/products/all", async (req, res) => {
             const filter = {};
             const cursor = ProductsCollection.find(filter);
-            const result = (await cursor.toArray()).reverse();
+            const result = (await cursor.toArray()).reverse().slice(0, 20);
             res.send(result);
         })
         // getting categorized products
         app.get("/products/categories", async (req, res) => {
             const category = req.query.category;
-            const filter = { category: category };
+            const filter = { subCategory: category };
             const cursor = ProductsCollection.find(filter);
-            const result = (await cursor.toArray()).reverse();
+            const products = (await cursor.toArray()).reverse();
+            const result = products.slice(0, 12);
             res.send(result);
         })
         // finding products on search
         app.get("/products/find", async (req, res) => {
             const searchText = req.query.q;
             const categoryText = req.query.category;
+            const subCategoryText = req.query.subCategory;
             const filter = {
                 title: {
                     $regex: searchText,
@@ -128,6 +131,9 @@ function run() {
             };
             if (categoryText) {
                 filter.category = categoryText
+            }
+            if (subCategoryText) {
+                filter.subCategory = subCategoryText
             }
             const cursor = ProductsCollection.find(filter);
             const result = (await cursor.toArray()).reverse();
